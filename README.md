@@ -1,0 +1,2 @@
+# salesforce_universal_lookup_field_lightning_component
+Universal Lookup Field Component for Salesforce Lightning
