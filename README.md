@@ -18,7 +18,7 @@ It look like standard field and could be used with Standard and Custom Objects.
        src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/deploy.png">
 </a>
 
-Optionally, you can install it as <a href="https://login.salesforce.com/packaging/installPackage.apexp?p0=04t0Y000001QMwU">unmanaged package</a>.
+Optionally, you can install it as <a href="https://login.salesforce.com/packaging/installPackage.apexp?p0=04t0Y000001QMwZ">unmanaged package</a>.
 Also available as <a href="">managed package on AppExhange</a>.
 
 ***
@@ -53,5 +53,5 @@ Custom Lookup component field has 6 attributes.
   * __showFiveRecent__ - feature from standard lookup field, showed 5 recently viewed records. Default is true.
 
   <p align="center">
-    <img width="250" src="https://image.ibb.co/fZFEEv/Aura_3.jpg" alt="showLastViewed">
+    <img width="550" src="https://image.ibb.co/fW4q2Q/ezgif_com_video_to_gif_1.gif" alt="showLastViewed">
   </p>
