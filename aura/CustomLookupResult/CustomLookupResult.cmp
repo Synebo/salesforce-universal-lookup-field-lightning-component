@@ -1,0 +1,49 @@
+<aura:component controller="LookupFieldController">
+    
+    <!--Attributes--> 
+    <aura:attribute name="objectResType" type="String"/>
+    <aura:attribute name="lookUpItem" type="SObject" />
+    <aura:attribute name="matchString" type="String" />
+    <aura:attribute name="additionalInfo" default="" type="String" />
+    <aura:attribute name="titleName" type="String" />
+    <aura:attribute name="iconPath" type="String" />
+    <aura:attribute name="iconColor" type="String"/>
+    
+    <aura:attribute name="matchResultBold" type="String" />
+    <aura:attribute name="matchResultSimple" type="String" />
+    <aura:attribute name="matchResultSimple_2" type="String" />
+    
+    <aura:attribute name="matchResultAdditionalBold" type="String" />
+    <aura:attribute name="matchResultAdditionalSimple" type="String" />
+    
+    <!--Event hendlers-->
+    <aura:registerEvent name="eSelectSObjectEvent" type="c:SelectSObjectEvent"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <li role="presentation" class="slds-listbox__item slds-p-around_small lookup_result_item" onclick="{! c.selectLookUpItem }" style="padding: .75rem;" >
+        <span id="listbox-option-unique-id-01" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+            <span class="slds-media__figure">
+                <aura:if isTrue="{! v.iconPath != ''}">
+                    <span class="slds-icon_container" style="{! 'background-color: #' + v.iconColor }" title="Description of icon when needed">
+                        <span class="uiImage" data-aura-class="uiImage">
+                            <img style="width: 25px;" src="{!$Resource.SLDS2_2_1  + v.iconPath +'_120.png'}" class="icon" alt="User" title="User"/>
+                        </span>
+                        <span class="slds-assistive-text">Description of icon</span>
+                    </span>
+                </aura:if>
+            </span>
+            <aura:if isTrue="{! v.additionalInfo != ''}">
+                <span class="slds-media__body">
+                    <span class="slds-listbox__option-text slds-listbox__option-text_entity" style="color: #18345e;">{!v.matchResultSimple}<b>{!v.matchResultBold}</b>{!v.matchResultSimple_2}</span>
+                    <span class="slds-lookup__result-meta secondaryLabel slds-truncate slds-text-body--small" style="margin-top: 5px;"><b>{!v.matchResultAdditionalBold}</b>{!v.matchResultAdditionalSimple}</span>
+                </span>
+            </aura:if>
+            <aura:if isTrue="{! v.additionalInfo == ''}">
+                <span class="slds-media__body" style="margin-top: 6px;">
+                    <span class="slds-listbox__option-text slds-listbox__option-text_entity" style="color: #18345e;">{!v.matchResultSimple}<b>{!v.matchResultBold}</b>{!v.matchResultSimple_2}</span>
+                </span>
+            </aura:if>
+        </span>
+    </li>
+    
+</aura:component>
