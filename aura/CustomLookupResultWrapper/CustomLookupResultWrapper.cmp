@@ -1,0 +1,34 @@
+<aura:component controller="LookupFieldController">
+    
+    <!--Attributes-->
+    <aura:attribute name="sObjectType" type="String"/>
+    <aura:attribute name="keyWord" type="String" default=""/>
+    <aura:attribute name="iconPath" type="String"/>
+    <aura:attribute name="iconColor" type="String"/>
+    <aura:attribute name="listOfSearchRecords" type="SObject[]" description=""/>
+    <aura:attribute name="objectPluralLabel" type="String"  />
+    
+    <aura:if isTrue="{! v.keyWord != ''}">
+        <div class="searchButton itemContainer slds-lookup__item-action--label slds-text-link--reset slds-grid slds-grid--vertical-align-center slds-truncate forceSearchInputLookupDesktopActionItem lookup__header" data-aura-class="forceSearchInputLookupDesktopActionItem" role="option">
+            
+            <span class="slds-icon_container slds-icon-utility-search itemIcon slds-icon slds-icon--x-small slds-m-left--x-small slds-icon-text-default slds-button__icon forceIcon" data-aura-class="forceIcon">
+                
+                <c:svg class="slds-input__icon slds-show iconStyle" xlinkHref="{!$Resource.SLDS2_2_1 + '/assets/icons/utility-sprite/svg/symbols.svg#search'}"/>
+                <span class="slds-assistive-text">Description of icon</span>
+                
+            </span>
+            
+            <span class="itemLabel slds-show slds-truncate slds-m-left--xx-small" title="&quot;Tes&quot; in Contacts" >"{!v.keyWord}" in {!v.objectPluralLabel}</span>
+            
+        </div>
+    </aura:if>
+    <aura:iteration items="{!v.listOfSearchRecords}" var="singleRec" >
+        <c:CustomLookupResult lookUpItem="{!singleRec}" 
+                              objectResType="{!v.sObjectType}" 
+                              iconPath="{!v.iconPath}" 
+                              iconColor="{!v.iconColor}" 
+                              matchString="{!v.keyWord}"
+                              additionalInfo="" />
+    </aura:iteration>
+    
+</aura:component>
