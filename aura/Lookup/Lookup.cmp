@@ -1,0 +1,137 @@
+<aura:component controller="LookupFieldController"
+                implements="force:appHostable,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+                access="global">
+    
+    <ltng:require styles="{!$Resource.SLDS2_2_1  + '/assets/styles/salesforce-lightning-design-system.css'}"/>
+    
+    <!--Global attributes--> 
+    <aura:attribute name="objectType" 
+                    type="String" 
+                    access="global" />
+    <aura:attribute name="showFiveRecent" 
+                    type="Boolean" default="true" 
+                    access="global"/>
+    <aura:attribute name="selectedRecordId" 
+                    type="String" 
+                    access="global"/>
+    <aura:attribute name="readOnly" 
+                    type="Boolean" default="false" 
+                    access="global"/>
+    <aura:attribute name="widthPX" 
+                    type="String" default="300px" 
+                    access="global"/>
+    <aura:attribute name="label" 
+                    type="String" default=""
+                    access="global" />
+    
+    <!--Attributes--> 
+    <aura:attribute name="selectedRecord" 
+                    type="SObject" default="{}" 
+                    description="Use,for store SELECTED sObject Record"/>
+    
+    <aura:attribute name="selectedRecordTitle" type="String"/>
+    <aura:attribute name="prevSelectedRecordId" type="String"/>
+    <aura:attribute name="prevSelectedRecord" type="SObject" 
+                    description="Use,for store SELECTED sObject Record"/>
+    
+    <aura:attribute name="searchIsActive" type="Boolean" default="false"/>
+    <aura:attribute name="objectIconPath" type="String" />
+    <aura:attribute name="objectIconColor" type="String" />
+    <aura:attribute name="objectPluralLabel" type="String" />
+    
+    <aura:attribute name="listOfSearchRecords" type="SObject[]" description="Use,for store the list of search records which returns from apex class"/>
+    <aura:attribute name="listOfSearchRecordsRecent" type="SObject[]" description="Use,for store the list of search records which returns from apex class"/>
+    <aura:attribute name="searchKeyWord" type="string" default=""/>
+    
+    <!--Event hendlers-->  
+    <aura:handler name="eSelectSObjectEvent" 
+                  event="c:SelectSObjectEvent" 
+                  action="{!c.handleComponentEvent}"/>
+    <aura:handler name="init" 
+                  value="{!this}" 
+                  action="{!c.doInit}"/>
+    
+    {!body}
+    <div class="slds-m-around--large" style="{! 'width:' + v.widthPX }">
+        <div aura:id="searchRes" class="slds-form-element slds-lookup slds-is-close" data-select="single">
+            <label class="slds-form-element__label" for="lookup-348">{!v.label}</label>
+            
+            <!--Display search bar for lookup-->  
+            <aura:if isTrue="{! v.searchIsActive }">
+                <button class="slds-button inlineEditUndo slds-float_right slds-button--icon-container" type="button" title="Undo..." onclick="{! c.undoObject }" style="float:right;" >
+                    <span>
+                        <c:svg class="slds-input__icon slds-show small_icon"  xlinkHref="{!$Resource.SLDS2_2_1  + '/assets/icons/utility-sprite/svg/symbols.svg#undo'}" />
+                    </span>
+                </button>
+            </aura:if>
+            <div class="slds-form-element__control">
+                <div class="slds-input-has-icon slds-input-has-icon--right">
+                    
+                    <!-- Record is selected -->
+                    <div aura:id="lookup-pill" class="slds-pill-container slds-hide">
+                        
+                        <aura:if isTrue="{!v.readOnly}">
+                            <span class="slds-pill slds-m-around_xx-small" style="height: 37px;margin: 2px;background-color: #e0e5ee;border-color: #a8b7c7;cursor: not-allowed;">
+                                <aura:if isTrue="{! v.objectIconPath != ''}">
+                                    <span class="slds-m-around_xx-small pillIcon" style="{! 'background-color: #' + v.objectIconColor + '; margin: 2px;border-radius: 3px;' }">
+                                        <span class="uiImage" data-aura-class="uiImage">
+                                            <img src="{!$Resource.SLDS2_2_1  + v.objectIconPath +'_120.png'}"  alt="User" style="width:20px;" />
+                                        </span>
+                                    </span>
+                                </aura:if>
+                                <span class="slds-pill__label" style="padding-left: 6px; color: rgb(22, 50, 92);">
+                                    {!v.selectedRecordTitle}
+                                </span>
+                                
+                                <button class="slds-button slds-button--icon slds-pill__remove slds-m-around_xxx-small" onclick="{!c.clear}" disabled="{!v.readOnly}">
+                                    <c:svg class="slds-button__icon" xlinkHref="{!$Resource.SLDS2_2_1  + '/assets/icons/utility-sprite/svg/symbols.svg#close'}" />
+                                    <span class="slds-assistive-text">Remove</span>
+                                </button>
+                            </span>
+                            <aura:set attribute="else">
+                                <span class="slds-pill slds-m-around_xx-small" style="height: 37px;margin: 2px;">
+                                    <aura:if isTrue="{! v.objectIconPath != ''}">
+                                        <span class="slds-m-around_xx-small pillIcon" style="{! 'background-color: #' + v.objectIconColor + '; margin: 2px;border-radius: 3px;' }">
+                                            <span class="uiImage" data-aura-class="uiImage">
+                                                <img src="{!$Resource.SLDS2_2_1  + v.objectIconPath +'_120.png'}"  alt="User" style="width:20px;" />
+                                            </span>
+                                        </span>
+                                    </aura:if>
+                                    <span class="slds-pill__label" style="padding-left: 6px; color: rgb(22, 50, 92);">
+                                        {!v.selectedRecordTitle}
+                                    </span>
+                                    
+                                    <button class="slds-button slds-button--icon slds-pill__remove slds-m-around_xxx-small" onclick="{!c.clear}" disabled="{!v.readOnly}">
+                                        <c:svg class="slds-button__icon" xlinkHref="{!$Resource.SLDS2_2_1  + '/assets/icons/utility-sprite/svg/symbols.svg#close'}" />
+                                        <span class="slds-assistive-text">Remove</span>
+                                    </button>
+                                </span>
+                            </aura:set>
+                        </aura:if> 
+                        
+                    </div>
+                    <!-- END -->
+                    
+                    <div aura:id="lookupField" class="slds-show">
+                        <ui:inputText updateOn="keyup" 
+                                      disabled="{!v.readOnly}"
+                                      focus="{!c.showRecentViewes}"
+                                      keyup="{!c.keyPressController}" 
+                                      class="slds-lookup__search-input slds-input " 
+                                      value="{!v.searchKeyWord}" 
+                                      placeholder="{! 'Search ' + v.objectPluralLabel }"/>
+                    </div>  
+                </div>
+            </div>
+            
+            
+            <div class="slds-lookup__menu slds">
+                <ul class="slds-lookup__list" role="listbox" aura:id="lookupResultsContainer" >
+                    
+                </ul>
+            </div>
+            
+        </div>
+    </div>
+    
+</aura:component>
