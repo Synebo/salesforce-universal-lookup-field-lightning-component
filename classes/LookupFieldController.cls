@@ -1,4 +1,4 @@
-global class LookupFieldController {
+global with sharing class LookupFieldController {
     
     // Title        : obtainObjectList
     // Input params : searchKeyWord - String key for search, objectType - type of Lookup
@@ -8,11 +8,11 @@ global class LookupFieldController {
     global static List<SObject> obtainObjectList(String searchKeyWord, String objectType) {
         
         List<SObject> obtainList = new List < SObject > ();
-        String query = gererateQuery(objectType, searchKeyWord, false);
+        String query = generateQuery(objectType, searchKeyWord, false);
         
-        //System.debug(query);
-        
-        obtainList = DataBase.query(query);
+        if (query != '') {
+            obtainList = DataBase.query(query);
+        }
         
         return obtainList;
     }
@@ -24,15 +24,17 @@ global class LookupFieldController {
     @AuraEnabled
     global static SObject obtainObjectById(String searchById, String objectType) {
         
-        List<SObject> obtainList = new List < SObject > ();
+        List<SObject> obtainList = new List <SObject> ();
+        SObjectType schemaType = Schema.getGlobalDescribe().get(objectType);
+        Map<String, SObjectField> fieldMap = schemaType.getDescribe().fields.getMap();
         String query = 'SELECT Id, Name FROM ' + objectType + ' WHERE Id = \'' + searchById + '\' LIMIT 1';
         
-        //System.debug(query);
-        
-        obtainList = DataBase.query(query);
-        
-        if (!obtainList.isEmpty()) {
-            return obtainList[0];
+        if (fieldMap.get('Id').getDescribe().isAccessible() && fieldMap.get('Name').getDescribe().isAccessible() && schemaType.getDescribe().isAccessible()) {
+            obtainList = DataBase.query(query);
+            
+            if (!obtainList.isEmpty()) {
+                return obtainList[0];
+            }
         }
         return null;
     }
@@ -148,8 +150,8 @@ global class LookupFieldController {
         classicIconToLighting.put('trophy32.png',        'custom48');
         classicIconToLighting.put('truck32.png',         'custom98');
         classicIconToLighting.put('plane32.png',         'custom20');
-
-           
+        
+        
         try {
             
             SObjectType sObjectTypeItem = Schema.getGlobalDescribe().get(objectType);
@@ -163,7 +165,7 @@ global class LookupFieldController {
                 info.iconPath = '/assets/icons/standard/user';
                 info.iconColor = '67cbe4';
             } else {
-            
+                
                 for (DescribeTabSetResult tsr : Schema.describeTabs()) {
                     for (DescribeTabResult tr : tsr.getTabs()) {
                         
@@ -190,12 +192,9 @@ global class LookupFieldController {
                     }
                 }
                 
-                //if (searchById != null || searchById != '') {
-                  //  info.objRecord = obtainObjectById(searchById, objectType); 
-                //}
             }
         } catch (Exception ex) {
-            System.debug('Exception! Error: ' + ex.getMessage() + '. Line: ' + ex.getLineNumber());
+            System.debug('Exception. Error: ' + ex.getMessage() + '. Line: ' + ex.getLineNumber());
         }
         
         return info;
@@ -210,85 +209,153 @@ global class LookupFieldController {
         
         List<SObject> recentRecordsList = new List<SObject>();
         
-        String query = gererateQuery(objectType, '', true);
-        recentRecordsList = DataBase.query(query);
-        System.debug(query);
+        String query = generateQuery(objectType, '', true);
+        
+        if (query != '') {
+            recentRecordsList = DataBase.query(query);
+        }
         
         return recentRecordsList;
     }
     
     
-    // Title        : gererateQuery
+    // Title        : generateQuery
     // Input params : objectType - type of Lookup, searchKeyWord - String key for search, isLastViewed - is it for lastViewed
     // Return value : List<SObject> 
     // Description  : Method for obtaining 5 Lastviewed records 
-    public static String gererateQuery(String objectType, String searchKeyWord, Boolean isLastViewed) {
+    public static String generateQuery(String objectType, String searchKeyWord, Boolean isLastViewed) {
         
         String query = '';
-        String searchKey = '';
+        String clause = obtaineClause (objectType, searchKeyWord);
+        List<String> fieldList = obtainFieldList(objectType);
+        SObjectType schemaType = Schema.getGlobalDescribe().get(objectType);
         
-        if (objectType.toLowerCase() == 'case' && Schema.sObjectType.Case.fields.Id.isAccessible() && Schema.sObjectType.Case.fields.CaseNumber.isAccessible() && Schema.sObjectType.Case.fields.Subject.isAccessible()) {
-            query = 'SELECT Id, CaseNumber, Subject ';
-        } else if (objectType.toLowerCase() == 'contract' && Schema.sObjectType.Contract.fields.Id.isAccessible() && Schema.sObjectType.Contract.fields.ContractNumber.isAccessible()) {
-            query = 'SELECT Id, ContractNumber ';
-        } else if (objectType.toLowerCase() == 'order' && Schema.sObjectType.Order.fields.Id.isAccessible() && Schema.sObjectType.Order.fields.OrderNumber.isAccessible()) {
-            query = 'SELECT Id, OrderNumber ';
-        } else if (objectType.toLowerCase() == 'orderitem' && Schema.sObjectType.Orderitem.fields.Id.isAccessible() && Schema.sObjectType.Orderitem.fields.OrderItemNumber.isAccessible()) {
-            query = 'SELECT Id, OrderItemNumber ';
-        } else {
-            query = 'SELECT Id, Name ';
-        }
-        
-        if ((objectType.toLowerCase() == 'contact' && Schema.sObjectType.Contact.fields.FirstName.isAccessible() && Schema.sObjectType.Contact.fields.LastName.isAccessible()) || 
-            (objectType.toLowerCase() == 'user') && Schema.sObjectType.User.fields.FirstName.isAccessible() && Schema.sObjectType.User.fields.LastName.isAccessible()) {
-            query += ', FirstName, LastName ';
-        }
-        
-        if ((objectType.toLowerCase() == 'contact' && Schema.sObjectType.Contact.fields.AccountId.isAccessible()) || (objectType.toLowerCase() == 'order' && Schema.sObjectType.Order.fields.AccountId.isAccessible()) || (objectType.toLowerCase() == 'contract' && Schema.sObjectType.Contract.fields.AccountId.isAccessible())) {
-            query += ', Account.Name ';
-        }
-        
-        if (objectType.toLowerCase() == 'lead' && Schema.sObjectType.Lead.fields.FirstName.isAccessible() && Schema.sObjectType.Lead.fields.LastName.isAccessible() && Schema.sObjectType.Lead.fields.Title.isAccessible()) {
-            query += ', FirstName, LastName, Title ';
-        }
-        if (objectType.toLowerCase() == 'product2' && Schema.sObjectType.Product2.fields.ProductCode.isAccessible()) {
-            query += ', ProductCode ';
-        }
-        
-        query += ' FROM ' + objectType;
-        
-        if (searchKeyWord != null && searchKeyWord != '') {
-            searchKey = searchKeyWord + '%';
+        if (!fieldList.isEmpty() && schemaType.getDescribe().isAccessible()) {
+            query = 'SELECT ' + String.join(fieldList, ',');
+            query += ' FROM ' + objectType;
+            query += ' ' + clause;
             
-            if (objectType.toLowerCase() == 'case') {
-                query += ' WHERE CaseNumber Like \'' + searchKey + '\' OR Subject Like \'' + searchKey + '\'';
-            } else if (objectType.toLowerCase() == 'user') {
-                query += ' WHERE Name Like \'' + searchKey + '\' OR FirstName Like \'' + searchKey + '\' OR LastName Like \'' + searchKey + '\'';
-            } else if (objectType.toLowerCase() == 'contact') {
-                query += ' WHERE Name Like \'' + searchKey + '\' OR Account.Name Like \'' + searchKey + '\' OR FirstName Like\'' + searchKey + '\' OR LastName Like\'' + searchKey + '\'';
-            } else if (objectType.toLowerCase() == 'lead') {
-                query += ' WHERE Name Like \'' + searchKey + '\' OR Title Like \'' + searchKey + '\' OR FirstName Like\'' + searchKey + '\' OR LastName Like\'' + searchKey + '\''; 
-            } else if (objectType.toLowerCase() == 'product2') {
-                query += ' WHERE Name Like \'' + searchKey + '\' OR ProductCode Like \'' + searchKey + '\'';
-            } else if (objectType.toLowerCase() == 'contract') {
-                query += ' WHERE ContractNumber Like \'' + searchKey + '\' OR Account.Name Like \'' + searchKey + '\'';
-            } else if (objectType.toLowerCase() == 'order') {
-                query += ' WHERE OrderNumber Like \'' + searchKey + '\' OR Account.Name Like \'' + searchKey + '\'';
-            } else if (objectType.toLowerCase() == 'orderitem') {
-                query += ' WHERE OrderItemNumber Like \'' + searchKey + '\'';
-            } else {
-                query += ' WHERE Name Like \'' + searchKey + '\'';
+            if (isLastViewed) {
+                query += ' WHERE LastViewedDate != null ORDER BY LastViewedDate DESC ';
+                query += ' LIMIT 5';
             }
-        }
-        
-        if (isLastViewed) {
-            query += ' WHERE LastViewedDate != null ORDER BY LastViewedDate DESC ';
-            query += ' LIMIT 5';
         }
         
         return query;
     }
     
+    public static List<SObject> runQuery(String objectType, String searchKeyWord, Boolean isLastViewed) {
+        
+        String query = '';
+        List<SObject> obtainList = new List <SObject> ();
+        
+        String clause = obtaineClause (objectType, searchKeyWord);
+        List<String> fieldList = obtainFieldList(objectType);
+        SObjectType schemaType = Schema.getGlobalDescribe().get(objectType);
+        
+        if (!fieldList.isEmpty() && schemaType.getDescribe().isAccessible()) {
+            query = 'SELECT ' + String.join(fieldList, ',');
+            query += ' FROM ' + objectType;
+            query += ' ' + clause;
+            
+            if (isLastViewed) {
+                query += ' WHERE LastViewedDate != null ORDER BY LastViewedDate DESC ';
+                query += ' LIMIT 5';
+            }
+            
+            obtainList = DataBase.query(query);
+        }
+        
+        return obtainList;
+    }
+    
+    private static Set<String> obtainFieldSet(String sObjectType) {
+        
+        Set<String> fieldSet = new Set<String>();
+        
+        if (sObjectType.toLowerCase() == 'case') {
+            fieldSet.addAll(new Set<String>{'Id', 'CaseNumber', 'Subject'});
+        } else if (sObjectType.toLowerCase() == 'contract') {
+            fieldSet.addAll(new Set<String>{'Id', 'ContractNumber'});
+        } else if (sObjectType.toLowerCase() == 'order') {
+            fieldSet.addAll(new Set<String>{'Id', 'OrderNumber'});
+        } else if (sObjectType.toLowerCase() == 'orderitem') {
+            fieldSet.addAll(new Set<String>{'Id', 'OrderItemNumber'});
+        } else {
+            fieldSet.addAll(new Set<String>{'Id', 'Name'});
+        }
+        
+        if (sObjectType.toLowerCase() == 'contact' || sObjectType.toLowerCase() == 'user' ) {
+            fieldSet.addAll(new Set<String>{'FirstName', 'LastName'});	
+        }
+        
+        if (sObjectType.toLowerCase() == 'contact' || sObjectType.toLowerCase() == 'order' || sObjectType.toLowerCase() == 'contract') {
+            fieldSet.add('Account.Name');
+        }
+        
+        if (sObjectType.toLowerCase() == 'lead') {
+            fieldSet.addAll(new Set<String>{'FirstName', 'LastName', 'Title'});
+        }
+        if (sObjectType.toLowerCase() == 'product2') {
+            fieldSet.add('ProductCode');
+        }
+        
+        return fieldSet;
+    }
+    
+    private static List<String> obtainFieldList(String sObjectType) {
+        
+        SObjectType schemaType = Schema.getGlobalDescribe().get(sObjectType);
+        Map<String, SObjectField> fieldMap = schemaType.getDescribe().fields.getMap();
+        List<String> fieldList = new List<String>();
+        SObjectType schemaTypeAccount = Schema.getGlobalDescribe().get('Account');
+        Map<String, SObjectField> accountFieldMap = schemaTypeAccount.getDescribe().fields.getMap();
+        
+        Set<String> fieldSet = new Set<String>();
+        fieldSet = obtainFieldSet(sObjectType);
+        
+        if (!fieldSet.isEmpty() && schemaType.getDescribe().isAccessible()) {
+            
+            for (String field_i : fieldSet) {
+                if (field_i != 'Account.Name' && fieldMap.get(field_i).getDescribe().isAccessible()) {
+                    fieldList.add(field_i.trim());
+                } else if (schemaTypeAccount.getDescribe().isAccessible() && fieldMap.get('AccountId').getDescribe().isAccessible() && field_i.contains('Account') && fieldMap.get('AccountId').getDescribe().isAccessible() && accountFieldMap.get('Name').getDescribe().isAccessible()){
+                    fieldList.add(field_i.trim());
+                }
+            }
+        }
+        
+        return fieldList;
+    }
+    
+    private static String obtaineClause (String sObjectType, String searchKeyWord) {
+        String clause = '', searchKey = '';
+        
+        if (searchKeyWord != null && searchKeyWord != '') {
+            searchKey = searchKeyWord + '%';
+            
+            if (sObjectType.toLowerCase() == 'case') {
+                clause += ' WHERE CaseNumber Like \'' + searchKey + '\' OR Subject Like \'' + searchKey + '\'';
+            } else if (sObjectType.toLowerCase() == 'user') {
+                clause += ' WHERE Name Like \'' + searchKey + '\' OR FirstName Like \'' + searchKey + '\' OR LastName Like \'' + searchKey + '\'';
+            } else if (sObjectType.toLowerCase() == 'contact') {
+                clause += ' WHERE Name Like \'' + searchKey + '\' OR Account.Name Like \'' + searchKey + '\' OR FirstName Like\'' + searchKey + '\' OR LastName Like\'' + searchKey + '\'';
+            } else if (sObjectType.toLowerCase() == 'lead') {
+                clause += ' WHERE Name Like \'' + searchKey + '\' OR Title Like \'' + searchKey + '\' OR FirstName Like\'' + searchKey + '\' OR LastName Like\'' + searchKey + '\''; 
+            } else if (sObjectType.toLowerCase() == 'product2') {
+                clause += ' WHERE Name Like \'' + searchKey + '\' OR ProductCode Like \'' + searchKey + '\'';
+            } else if (sObjectType.toLowerCase() == 'contract') {
+                clause += ' WHERE ContractNumber Like \'' + searchKey + '\' OR Account.Name Like \'' + searchKey + '\'';
+            } else if (sObjectType.toLowerCase() == 'order') {
+                clause += ' WHERE OrderNumber Like \'' + searchKey + '\' OR Account.Name Like \'' + searchKey + '\'';
+            } else if (sObjectType.toLowerCase() == 'orderitem') {
+                clause += ' WHERE OrderItemNumber Like \'' + searchKey + '\'';
+            } else {
+                clause += ' WHERE Name Like \'' + searchKey + '\'';
+            }
+        }
+        return clause;
+    }
     
     global class InfoWrapper {
         @AuraEnabled
@@ -303,5 +370,5 @@ global class LookupFieldController {
         global SObject objRecord { get; set; }
         
     }
-
+    
 }
