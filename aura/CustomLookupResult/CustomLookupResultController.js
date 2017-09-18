@@ -1,7 +1,7 @@
 ({    
     doInit: function(component) {
         var typeSObject = component.get("v.objectResType");
-		var fullName = '';
+	var fullName = '';
         var lowerCaseFullName = '';
         var additionalInfo = '';
         var lowerCaseAdditionalInfo = '';
@@ -44,7 +44,6 @@
             additionalInfo = component.get("v.additionalInfo");
 			lowerCaseAdditionalInfo = additionalInfo.toLowerCase();            
             
-            console.log(lowerCaseFullName[lowerCaseFullName.indexOf(lowerCaseMach)-1]);
             if ((lowerCaseFullName.indexOf(lowerCaseMach) == 0 || (lowerCaseFullName.indexOf(lowerCaseMach) > 0 && lowerCaseFullName[lowerCaseFullName.indexOf(lowerCaseMach)-1] == ' ')) && lowerCaseMach && lowerCaseMach != '') {
                 component.set("v.matchResultBold", fullName.substring(lowerCaseFullName.indexOf(lowerCaseMach), lowerCaseFullName.indexOf(lowerCaseMach)+matchPart.length));
                 component.set("v.matchResultSimple", fullName.substring(0, lowerCaseFullName.indexOf(lowerCaseMach)));
@@ -60,7 +59,6 @@
 				component.set("v.matchResultAdditionalSimple", additionalInfo);                
             }
             
-            console.log(component.get("v.matchResultSimple_2"));
         }
     },
     
@@ -89,7 +87,6 @@
         compEvent.setParams({"colorIcon" : component.get("v.iconColor") });
         compEvent.setParams({"titleName" : titleStr});
         compEvent.fire();
-    },
-    
-
+        
+    }
 })
