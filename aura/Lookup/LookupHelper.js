@@ -47,7 +47,9 @@
                             tmp.push(listRecords[i]);
                         }
                     } else if (type.toLowerCase() == 'order') {
-                        if (listRecords[i].OrderNumber.toLowerCase().startsWith(getInputkeyWord.toLowerCase())) {
+                        
+                        if ((listRecords[i].OrderNumber && listRecords[i].OrderNumber.toLowerCase().startsWith(getInputkeyWord.toLowerCase()) ) || 
+                            (listRecords[i].Account.Name && listRecords[i].Account.Name.toLowerCase().startsWith(getInputkeyWord.toLowerCase()))) {
                             
                             tmp.push(listRecords[i]);
                         }
@@ -83,6 +85,9 @@
             }
             
         } else {
+            
+            component.set("v.listOfSearchRecords", null);
+            
             action = component.get("c.obtainObjectList");
             action.setParams({
                 'searchKeyWord' : getInputkeyWord,
@@ -91,7 +96,7 @@
             
             action.setCallback(this, function(response) {
                 var state = response.getState();
-                component.set("v.listOfSearchRecords", null);
+                
                 
                 if (state === "SUCCESS") {
                     var storeResponse = response.getReturnValue();
@@ -112,7 +117,7 @@
                                            container.set("v.body", body);
                                        });
                     
-                }
+                } else alert('dd');
                 
             });
             
