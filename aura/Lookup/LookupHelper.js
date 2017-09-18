@@ -117,7 +117,7 @@
                                            container.set("v.body", body);
                                        });
                     
-                } else alert('dd');
+                }
                 
             });
             
