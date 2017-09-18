@@ -8,7 +8,7 @@
         });
         
         action.setCallback(this, function(response) {
-            debugger;
+            
             var state = response.getState();
             
             if (state === "SUCCESS") {
