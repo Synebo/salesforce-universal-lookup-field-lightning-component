@@ -18,7 +18,7 @@ It look like standard field and could be used with Standard and Custom Objects.
        src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/deploy.png">
 </a>
 
-Optionally, you can install it as <a href="https://login.salesforce.com/packaging/installPackage.apexp?p0=04t0Y000001QMwZ">unmanaged package</a>.
+Optionally, you can install it as <a href="https://login.salesforce.com/packaging/installPackage.apexp?p0=04t0Y000002BYze">unmanaged package</a>.
 Also available as <a href="">managed package on AppExhange</a>.
 
 ***
