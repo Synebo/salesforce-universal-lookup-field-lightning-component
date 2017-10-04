@@ -1,4 +1,4 @@
-# Universal Lookup Field Component for Salesforce Lightning
+# Lightning Universal Lookup Component for Salesforce Lightning
 ## Powerful lookup component for your developments
 
 Boost the development of your custom components with a new powerful lookup component. It looks like a standard one, pretty easy to customize and works everywhere – even in Salesforce1.
