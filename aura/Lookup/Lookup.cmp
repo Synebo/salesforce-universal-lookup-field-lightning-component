@@ -17,8 +17,8 @@
     <aura:attribute name="readOnly" 
                     type="Boolean" default="false" 
                     access="global"/>
-    <aura:attribute name="widthPX" 
-                    type="String" default="300px" 
+    <aura:attribute name="width" 
+                    type="String" default="100%" 
                     access="global"/>
     <aura:attribute name="label" 
                     type="String" default=""
@@ -52,7 +52,7 @@
                   action="{!c.doInit}"/>
     
     {!body}
-    <div class="slds-m-around--large" style="{! 'width:' + v.widthPX }">
+    <div style="{! 'width:' + v.width }">
         <div aura:id="searchRes" class="slds-form-element slds-lookup slds-is-close" data-select="single">
             <label class="slds-form-element__label" for="lookup-348">{!v.label}</label>
             
