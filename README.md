@@ -35,7 +35,7 @@ Also available as <a href="https://appexchange.salesforce.com/listingDetail?list
                  selectedRecordId = "{! v.selectedId }"
                  readOnly = "false"
                  showFiveRecent = "false"
-                 widthPX="400px">
+                 width="400px">
 </l_lookup:Lookup>
 
 ```
@@ -52,7 +52,7 @@ Custom Lookup component field has 6 attributes.
 
 #### Optional attributes:
   * __label__ - label. Default is label from Object.
-  * __widthPX__ - width of field. Default is ‘300px’.
+  * __width__ - width of field. Default is ‘100%’.
   * __readOnly__ - is field editavle. Default is false.
   * __showFiveRecent__ - feature from standard lookup field, showed 5 recently viewed records. Default is true.
 
