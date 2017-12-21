@@ -23,6 +23,9 @@
     <aura:attribute name="label" 
                     type="String" default=""
                     access="global" />
+    <aura:attribute name="whereClause"
+                    type="String"
+                    access="global" />
     
     <!--Attributes--> 
     <aura:attribute name="selectedRecord" 
@@ -51,7 +54,7 @@
                   value="{!this}" 
                   action="{!c.doInit}"/>
     
-    {!body}
+    {!v.body}
     <div style="{! 'width:' + v.width }">
         <div aura:id="searchRes" class="slds-form-element slds-lookup slds-is-close" data-select="single">
             <label class="slds-form-element__label" for="lookup-348">{!v.label}</label>

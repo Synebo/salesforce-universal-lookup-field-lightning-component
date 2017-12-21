@@ -91,7 +91,8 @@
             action = component.get("c.obtainObjectList");
             action.setParams({
                 'searchKeyWord' : getInputkeyWord,
-                'objectType'    : component.get("v.objectType")
+                'objectType'    : component.get("v.objectType"),
+                'whereClause'   : component.get("v.whereClause")
             });
             
             action.setCallback(this, function(response) {
