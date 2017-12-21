@@ -81,6 +81,8 @@
                                            var body = container.get("v.body");
                                            body.push(newList);
                                            container.set("v.body", body);
+                                           var items = component.get("v.itemHeight");
+                                           $A.util.addClass(container, 'items'+items);
                                        });
             }
             
@@ -116,8 +118,12 @@
                                            var body = container.get("v.body");
                                            body.push(newList);
                                            container.set("v.body", body);
+                                           var items = component.get("v.itemHeight");
+                                           $A.util.addClass(container, 'items'+items);
                                        });
                     
+                } else {
+                    console.error(response.getError());
                 }
                 
             });
@@ -162,6 +168,8 @@
                                            var body = container.get("v.body");
                                            body.push(newList);
                                            container.set("v.body", body);
+                                           var items = component.get("v.itemHeight");
+                                           $A.util.addClass(container, 'items'+items);
                                        });
                     
                 }

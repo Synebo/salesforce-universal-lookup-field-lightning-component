@@ -26,6 +26,11 @@
     <aura:attribute name="whereClause"
                     type="String"
                     access="global" />
+    <aura:attribute name="itemHeight"
+                    type="Integer"
+                    description="The number of items to show at once in the list.  Default=7"
+                    default="7"
+                    access="global" />
     
     <!--Attributes--> 
     <aura:attribute name="selectedRecord" 
@@ -55,7 +60,7 @@
                   action="{!c.doInit}"/>
     
     {!v.body}
-    <div style="{! 'width:' + v.width }">
+    <div class="" style="{! 'width:' + v.width }">
         <div aura:id="searchRes" class="slds-form-element slds-lookup slds-is-close" data-select="single">
             <label class="slds-form-element__label" for="lookup-348">{!v.label}</label>
             

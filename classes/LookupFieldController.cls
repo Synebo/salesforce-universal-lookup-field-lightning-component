@@ -274,6 +274,9 @@ global with sharing class LookupFieldController {
         if (sObjectType.toLowerCase() == 'product2') {
             fieldSet.add('ProductCode');
         }
+        if (sObjectType.toLowerCase() == 'pricebookentry') {
+            fieldSet.add('ProductCode');
+        }
 
         return fieldSet;
     }
@@ -307,7 +310,9 @@ global with sharing class LookupFieldController {
         String clause = '', searchKey = '';
 
         if (searchKeyWord != null && searchKeyWord != '') {
-            searchKey = searchKeyWord + '%';
+            searchKey = searchKeyword.replaceAll('\\*','%');
+            if(searchKey.substring(searchKey.length()-1)!='%')
+                searchKey += '%';
 
             if (sObjectType.toLowerCase() == 'case') {
                 clause += ' WHERE (CaseNumber Like \'' + searchKey + '\' OR Subject Like \'' + searchKey + '\')';
@@ -319,6 +324,8 @@ global with sharing class LookupFieldController {
                 clause += ' WHERE (Name Like \'' + searchKey + '\' OR Title Like \'' + searchKey + '\' OR FirstName Like\'' + searchKey + '\' OR LastName Like\'' + searchKey + '\')';
             } else if (sObjectType.toLowerCase() == 'product2') {
                 clause += ' WHERE (Name Like \'' + searchKey + '\' OR ProductCode Like \'' + searchKey + '\')';
+            } else if (sObjectType.toLowerCase() == 'pricebookentry') {
+                clause += ' WHERE (Product2.Name Like \'' + searchKey + '\' OR ProductCode Like \'' + searchKey + '\')';
             } else if (sObjectType.toLowerCase() == 'contract') {
                 clause += ' WHERE (ContractNumber Like \'' + searchKey + '\' OR Account.Name Like \'' + searchKey + '\')';
             } else if (sObjectType.toLowerCase() == 'order') {
