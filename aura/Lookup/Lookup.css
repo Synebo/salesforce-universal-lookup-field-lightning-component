@@ -2,3 +2,33 @@
     width: .875rem;
     height: .875rem;
 }
+.THIS .items1 {
+   max-height: calc((((1.5 * 0.8125rem) + (1.5 * 0.75rem) - 0.25rem) + (0.25rem * 2)) * 1);
+}
+.THIS .items2 {
+   max-height: calc((((1.5 * 0.8125rem) + (1.5 * 0.75rem) - 0.25rem) + (0.25rem * 2)) * 2);
+}
+.THIS .items3 {
+   max-height: calc((((1.5 * 0.8125rem) + (1.5 * 0.75rem) - 0.25rem) + (0.25rem * 2)) * 3);
+}
+.THIS .items4 {
+   max-height: calc((((1.5 * 0.8125rem) + (1.5 * 0.75rem) - 0.25rem) + (0.25rem * 2)) * 4);
+}
+.THIS .items5 {
+   max-height: calc((((1.5 * 0.8125rem) + (1.5 * 0.75rem) - 0.25rem) + (0.25rem * 2)) * 5);
+}
+.THIS .items6 {
+   max-height: calc((((1.5 * 0.8125rem) + (1.5 * 0.75rem) - 0.25rem) + (0.25rem * 2)) * 6);
+}
+.THIS .items7 {
+   max-height: calc((((1.5 * 0.8125rem) + (1.5 * 0.75rem) - 0.25rem) + (0.25rem * 2)) * 7);
+}
+.THIS .items8 {
+   max-height: calc((((1.5 * 0.8125rem) + (1.5 * 0.75rem) - 0.25rem) + (0.25rem * 2)) * 8);
+}
+.THIS .items9 {
+   max-height: calc((((1.5 * 0.8125rem) + (1.5 * 0.75rem) - 0.25rem) + (0.25rem * 2)) * 9);
+}
+.THIS .items10 {
+   max-height: calc((((1.5 * 0.8125rem) + (1.5 * 0.75rem) - 0.25rem) + (0.25rem * 2)) * 10);
+}

@@ -81,6 +81,8 @@
                                            var body = container.get("v.body");
                                            body.push(newList);
                                            container.set("v.body", body);
+                                           var items = component.get("v.itemHeight");
+                                           $A.util.addClass(container, 'items'+items);
                                        });
             }
             
@@ -91,7 +93,8 @@
             action = component.get("c.obtainObjectList");
             action.setParams({
                 'searchKeyWord' : getInputkeyWord,
-                'objectType'    : component.get("v.objectType")
+                'objectType'    : component.get("v.objectType"),
+                'whereClause'   : component.get("v.whereClause")
             });
             
             action.setCallback(this, function(response) {
@@ -115,8 +118,12 @@
                                            var body = container.get("v.body");
                                            body.push(newList);
                                            container.set("v.body", body);
+                                           var items = component.get("v.itemHeight");
+                                           $A.util.addClass(container, 'items'+items);
                                        });
                     
+                } else {
+                    console.error(response.getError());
                 }
                 
             });
@@ -161,6 +168,8 @@
                                            var body = container.get("v.body");
                                            body.push(newList);
                                            container.set("v.body", body);
+                                           var items = component.get("v.itemHeight");
+                                           $A.util.addClass(container, 'items'+items);
                                        });
                     
                 }
