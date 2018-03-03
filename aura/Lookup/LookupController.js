@@ -1,181 +1,156 @@
 ({
-    doInit: function(component) {
+    doInit: function(cmp, evt, helper) {
         
-        var action = component.get("c.getInfo");
+        var action = cmp.get("c.getObjectInfo");
         
         action.setParams({
-            'objectType'    : component.get("v.objectType")
+            'sObjectType'     : cmp.get("v.objectType"),
+            'additionalField' : cmp.get("v.additionalField")
         });
         
         action.setCallback(this, function(response) {
             
             var state = response.getState();
+            var storeResponse = response.getReturnValue();
             
-            if (state === "SUCCESS") {
-                var storeResponse = response.getReturnValue();
-                if (component.get("v.label") == "") {
-                    component.set("v.label", storeResponse.objectLabel);
+            if (state === "SUCCESS" && storeResponse.isSuccess) {
+                
+                var objectInfo = storeResponse.respBody;
+                if (cmp.get("v.label") == "") {
+                    cmp.set("v.label", objectInfo.objectLabel);
                 }
-                component.set("v.objectPluralLabel", storeResponse.objectPluralLabel);
-                component.set("v.objectIconPath", storeResponse.iconPath);
-                component.set("v.objectIconColor", storeResponse.iconColor);
+                if (cmp.get("v.pluralLabel") == "") {
+                    cmp.set("v.pluralLabel", objectInfo.objectPluralLabel);
+                }
+                cmp.set("v.objectIconPath", objectInfo.iconPath);
+                cmp.set("v.objectIconColor", objectInfo.iconColor);
+                cmp.set("v.mainField", objectInfo.mainField);
+                cmp.set("v.additionalFieldValue", objectInfo.additionalField);
+                
+            } else if (!storeResponse.isSuccess){
+                helper.errorCatched(cmp, storeResponse.shortErrorDescr, storeResponse.detailErrorDescr);
+            } else {
+                console.log('[l_lookup] Unexpected Exception from Lookup component. Please contact to contact@synebo.io.');
             }
         });
         
         $A.enqueueAction(action);
 
-        if (component.get("v.selectedRecordId") != null && component.get("v.selectedRecordId") != "") {
-            
-            var action1 = component.get("c.obtainObjectById");
-            
-            action1.setParams({
-                'searchById'    : component.get("v.selectedRecordId"),
-                'objectType'    : component.get("v.objectType")
-            });
-            
-            action1.setCallback(this, function(response) {
-                
-                var state = response.getState();
-                
-                if (state === "SUCCESS") {
-                    var storeResponse = response.getReturnValue();
-                    
-                    if (storeResponse && storeResponse != null) {
-                        component.set("v.selectedRecord", storeResponse);
-                        component.set("v.selectedRecordTitle", storeResponse.Name);
-                        
-                        var forclose = component.find("lookup-pill");
-                        $A.util.addClass(forclose, 'slds-show');
-                        $A.util.removeClass(forclose, 'slds-hide');
-                        
-                        var lookUpTarget = component.find("lookupField");
-                        $A.util.addClass(lookUpTarget, 'slds-hide');
-                        $A.util.removeClass(lookUpTarget, 'slds-show'); 
-                        
-                        var forclose = component.find("searchRes");
-                        $A.util.addClass(forclose, 'slds-is-close');
-                        $A.util.removeClass(forclose, 'slds-is-open');
-                    }
-                    
-                }
-            });
-            
-            $A.enqueueAction(action1);
-            
-            
+        if (cmp.get("v.selectedRecordId") != null && cmp.get("v.selectedRecordId") != "") {
+            helper.changeLookupValue(cmp, evt);
         }
-        
     },
     
-    undoObject : function(component, event, helper) {
+    undoObject : function(cmp, event, helper) {
         
-        var prevSelectedId = component.get("v.prevSelectedRecordId");
+        var prevSelectedId = cmp.get("v.prevSelectedRecordId");
         
-        component.set("v.searchKeyWord", "");
+        cmp.set("v.searchKeyWord", "");
 
         if (prevSelectedId && prevSelectedId.length > 0) {
             
-            component.set("v.searchIsActive", false);
+            cmp.set("v.searchIsActive", false);
             
-            component.set("v.selectedRecord", component.get("v.prevSelectedRecord")); 
-            component.set("v.selectedRecordId", component.get("v.prevSelectedRecordId"));
+            cmp.set("v.selectedRecord", cmp.get("v.prevSelectedRecord")); 
+            cmp.set("v.selectedRecordId", cmp.get("v.prevSelectedRecordId"));
             
-            
-            var forclose = component.find("lookup-pill");
+            var forclose = cmp.find("lookup-pill");
             $A.util.addClass(forclose, 'slds-show');
             $A.util.removeClass(forclose, 'slds-hide');
             
-            var lookUpTarget = component.find("lookupField");
+            var lookUpTarget = cmp.find("lookupField");
             $A.util.addClass(lookUpTarget, 'slds-hide');
             $A.util.removeClass(lookUpTarget, 'slds-show'); 
             
         }
         
-        var forclose = component.find("searchRes");
+        var forclose = cmp.find("searchRes");
         $A.util.addClass(forclose, 'slds-is-close');
         $A.util.removeClass(forclose, 'slds-is-open');
         
-        
+        helper.onChangeEventFire(cmp);
     },
     
-    keyPressController : function(component, event, helper) {
+    keyPressController : function(cmp, event, helper) {
         
-         
-        var getInputkeyWord = component.get("v.searchKeyWord");
+        var getInputkeyWord = cmp.get("v.searchKeyWord");
         
-        if (component.get("v.prevSelectedRecordId") != null || component.get("v.prevSelectedRecordId") != '')
-            component.set("v.searchIsActive", true );  
+        if (cmp.get("v.prevSelectedRecordId") != null || cmp.get("v.prevSelectedRecordId") != '')
+            cmp.set("v.searchIsActive", true );  
         if( getInputkeyWord.length > 0 ){
-            var forOpen = component.find("searchRes");
+            var forOpen = cmp.find("searchRes");
             $A.util.addClass(forOpen, 'slds-is-open');
             $A.util.removeClass(forOpen, 'slds-is-close');
-            helper.searchHelper(component,event,getInputkeyWord);
-        }
-        else{  
-            helper.showRecentViewesHlp(component, event, helper);         
-            var forclose = component.find("searchRes");
+            helper.searchHelper(cmp,event,getInputkeyWord);
+        } else {  
+            helper.showRecentViewesHlp(cmp, event, helper);         
+            var forclose = cmp.find("searchRes");
             $A.util.addClass(forclose, 'slds-is-close');
             $A.util.removeClass(forclose, 'slds-is-open');
         }
-        
     },
     
-    clear :function(component,event,heplper){
-        component.set("v.searchIsActive", true );  
-        
-        var pillTarget = component.find("lookup-pill");
-        var lookUpTarget = component.find("lookupField"); 
-        
-        $A.util.addClass(pillTarget, 'slds-hide');
-        $A.util.removeClass(pillTarget, 'slds-show');
-        
-        $A.util.addClass(lookUpTarget, 'slds-show');
-        $A.util.removeClass(lookUpTarget, 'slds-hide');
-        
-        component.set("v.prevSelectedRecord", component.get("v.selectedRecord")); 
-        component.set("v.prevSelectedRecordId", component.get("v.selectedRecordId")); 
-        
-        component.set("v.selectedRecord", null); 
-        component.set("v.selectedRecordId", null); 
-        
-        component.set("v.searchKeyWord", null);
-        component.set("v.listOfSearchRecords", null );
+    clear :function(cmp, evt, helper){
+        helper.clearHelper(cmp, evt);
     },
     
-    handleComponentEvent : function(component, event, helper) {
+    handleComponentEvent : function(cmp, event, helper) {
         
         var selectedItemFromEvent = event.getParam("selectedSObject");
-        component.set("v.searchIsActive", false ); 
+        cmp.set("v.searchIsActive", false ); 
         
-        component.set("v.selectedRecord" , selectedItemFromEvent); 
-        component.set("v.selectedRecordId" , selectedItemFromEvent.Id); 
-        component.set("v.selectedRecordTitle", event.getParam("titleName"))
-        component.set("v.objectIconPath", event.getParam("pathToIcon")); 
-        component.set("v.objectIconColor", event.getParam("colorIcon"));
-        component.set("v.searchKeyWord", "");
+        cmp.set("v.selectedRecord" , selectedItemFromEvent); 
+        cmp.set("v.selectedRecordId" , selectedItemFromEvent.Id); 
+        cmp.set("v.selectedRecordTitle", event.getParam("titleName"))
+        cmp.set("v.objectIconPath", event.getParam("pathToIcon")); 
+        cmp.set("v.objectIconColor", event.getParam("colorIcon"));
+        cmp.set("v.searchKeyWord", "");
         
-        var forclose = component.find("lookup-pill");
+        var forclose = cmp.find("lookup-pill");
         $A.util.addClass(forclose, 'slds-show');
         $A.util.removeClass(forclose, 'slds-hide');
         
-        
-        var forclose = component.find("searchRes");
+        var forclose = cmp.find("searchRes");
         $A.util.addClass(forclose, 'slds-is-close');
         $A.util.removeClass(forclose, 'slds-is-open');
         
-        var lookUpTarget = component.find("lookupField");
+        var lookUpTarget = cmp.find("lookupField");
         $A.util.addClass(lookUpTarget, 'slds-hide');
         $A.util.removeClass(lookUpTarget, 'slds-show');  
+        
+        helper.onChangeEventFire(cmp);
     },
     
-    showRecentViewes : function(component, event, helper) {
-        helper.showRecentViewesHlp(component, event, helper);      
+    showRecentViewes : function(cmp, event, helper) {
+        helper.onFocusEventFire(cmp);
+        helper.showRecentViewesHlp(cmp, event, helper);      
     },
     
-    hideRecentList : function(component, event, helper) {
-        var forOpen = component.find("searchRes");
+    hideRecentList : function(cmp, event, helper) {
+        var forOpen = cmp.find("searchRes");
         $A.util.addClass(forOpen, 'slds-is-close');
         $A.util.removeClass(forOpen, 'slds-is-open'); 
-    }
+    },
     
+    onBlur : function(cmp, event, helper) {
+        helper.onBlurEventFire(cmp);
+    },
+    
+    handlePreviousValue : function(cmp, evt) {
+        cmp.set("v.prevSelectedRecordId", evt.getParam("oldValue"));
+    },
+    
+    fireChanging : function(cmp, evt, helper) {
+        
+        if (!cmp.get("v.readOnly")) {
+            var newLookupId = cmp.get("v.setTo");
+            if (newLookupId == null || newLookupId && newLookupId.length == 15 || newLookupId && newLookupId.length == 18 ) {
+                helper.changeLookupValue(cmp, evt);
+            } else {
+                console.log('[l_lookup] Invalid Id to set. Please check it.');
+            }
+        } else {
+            console.log('[l_lookup] Component is in read only mode.');
+        }
+    }
 })

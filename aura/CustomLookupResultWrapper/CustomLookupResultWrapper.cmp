@@ -1,19 +1,32 @@
 <aura:component controller="LookupFieldController">
     
     <!--Attributes-->
-    <aura:attribute name="sObjectType" type="String"/>
-    <aura:attribute name="keyWord" type="String" default=""/>
-    <aura:attribute name="iconPath" type="String"/>
-    <aura:attribute name="iconColor" type="String"/>
-    <aura:attribute name="listOfSearchRecords" type="SObject[]" description=""/>
-    <aura:attribute name="objectPluralLabel" type="String"  />
+    <aura:attribute name="sObjectType" 
+                    type="String"/>
+    <aura:attribute name="keyWord" 
+                    type="String" 
+                    default=""/>
+    <aura:attribute name="iconPath" 
+                    type="String"/>
+    <aura:attribute name="iconColor" 
+                    type="String"/>
+    <aura:attribute name="listOfSearchRecords" 
+                    type="Object[]" 
+                    description="" />
+    <aura:attribute name="objectPluralLabel" 
+                    type="String" />
+    
+    <aura:attribute name="main" 
+                    type="String" />
+    <aura:attribute name="additional" 
+                    type="String" />
     
     <aura:if isTrue="{! v.keyWord != ''}">
         <div class="searchButton itemContainer slds-lookup__item-action--label slds-text-link--reset slds-grid slds-grid--vertical-align-center slds-truncate forceSearchInputLookupDesktopActionItem lookup__header" data-aura-class="forceSearchInputLookupDesktopActionItem" role="option">
             
             <span class="slds-icon_container slds-icon-utility-search itemIcon slds-icon slds-icon--x-small slds-m-left--x-small slds-icon-text-default slds-button__icon forceIcon" data-aura-class="forceIcon">
                 
-                <c:svg class="slds-input__icon slds-show iconStyle" xlinkHref="{!$Resource.SLDS2_2_1 + '/assets/icons/utility-sprite/svg/symbols.svg#search'}"/>
+                <lightning:icon iconName="utility:search" size="x-small"/>
                 <span class="slds-assistive-text">Description of icon</span>
                 
             </span>
@@ -28,7 +41,8 @@
                               iconPath="{!v.iconPath}" 
                               iconColor="{!v.iconColor}" 
                               matchString="{!v.keyWord}"
-                              additionalInfo="" />
+                              main="{!v.main}"
+                              additional="{!v.additional}" />
     </aura:iteration>
     
 </aura:component>
