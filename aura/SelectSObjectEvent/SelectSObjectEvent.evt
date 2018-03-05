@@ -1,6 +1,0 @@
-<aura:event type="COMPONENT" description="">
-    <aura:attribute name="selectedSObject" type="SObject"/>
-    <aura:attribute name="titleName" type="String"/>
-    <aura:attribute name="pathToIcon" type="String"/>
-    <aura:attribute name="colorIcon" type="String"/>
-</aura:event>
